@@ -1,3 +1,6 @@
+# AutoScan
+This is a basic mod that makes Deep Scans happen whenever your scanners would otherwise be idle (that is, whenever a scan finishes).
+
 # Stardeus Mod Template
 
 This is a mod template for [Stardeus](https://store.steampowered.com/app/1380910/Stardeus/).
