@@ -1,14 +1,14 @@
 using HarmonyLib;
 using Game.Systems;
 using UnityEngine;
-using UnityAPIBridge;
+using KL.Utils;
 
 public sealed class AutoScanPatcher
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void Register()
     {
-        UnityLogger.LogInfo("AutoScan is registering the Harmony patch.");
+        D.Warn("AutoScan is being registered, applying the Harmony patches.");
         var harmony = new Harmony("com.AutoScanPatcher.patch");
         harmony.PatchAll();
     }
