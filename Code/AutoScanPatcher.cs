@@ -33,6 +33,7 @@ class ScanSysPatch
             // Is that the right way to get the LogSys instance?..
             __instance.S.Sys.Log.AddLine("[AutoScan] Starting new Deep Scan.");
             // We assume that if the scan finished, we can probably start a new one - so won't do CheckHyperspace like SetScanMode does.
+            // it would be nice to call ScanUI.CheckCanScanDeep, though
             __instance.SetMode(ScanMode.Deep, null);
         }
         else
