@@ -7,9 +7,12 @@ using Game.Systems;
 using KL.Utils;
 using UnityEngine;
 using Game.Utils;
+using HarmonyLib;
 
-namespace AutoScan.Systems {
-    public sealed class AutoScanSys : GameSystem {
+namespace AutoScan.Systems
+{
+    public sealed class AutoScanSys : GameSystem
+    {
         // The convention is that all systems end with Sys, and SysId is equal to the class name
         public const string SysId = nameof(AutoScanSys);
         public override string Id => SysId;
@@ -17,7 +20,8 @@ namespace AutoScan.Systems {
         public override bool SkipInSandbox => true;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        private static void Register() {
+        private static void Register()
+        {
             GameSystems.Register(SysId, () => new AutoScanSys());
         }
 
@@ -35,9 +39,12 @@ namespace AutoScan.Systems {
         // public List<OverlayInfo> Overlays => overlays;
         // private readonly List<OverlayInfo> overlays = new();
 
-        protected override void OnInitialize() {
+        protected override void OnInitialize()
+        {
             // info logs are ignored by default, hmm
             D.LogAtLoc("AutoScan initializing!");
+            var harmony = new Harmony("com.AutoScan.patch");
+            harmony.PatchAll();
             // overlays.Clear();
             // overlays.Add(overlayInfo);
             // ui = new ExampleOverlayUI(this);
@@ -77,11 +84,13 @@ namespace AutoScan.Systems {
         //     D.Err("PLEASE REMOVE Clock.OnTick LISTENER IF YOU DON'T NEED IT IN YOUR MOD");
         // }
 
-        public override void Unload() {
+        public override void Unload()
+        {
             // Release the resources here
         }
 
-        public string GetName() {
+        public string GetName()
+        {
             return Id;
         }
 
@@ -99,5 +108,27 @@ namespace AutoScan.Systems {
         //     this.data = data;
         //     SomeVariable = data.GetInt("SomeVariable", 0);
         // }
+    }
+    [HarmonyPatch(typeof(ScanSys))]
+    class ScanSysPatch
+    {
+        [HarmonyPatch("OnScanDeep")]
+        [HarmonyPostfix]
+        static void OnScanDeepPatch(ScanSys __instance)
+        {
+            if (__instance.FoundSO != null)
+            {
+                // Is that the right way to get the LogSys instance?..
+                __instance.S.Sys.Log.AddLine("[AutoScan] Starting new Deep Scan.");
+                // We assume that if the scan finished, we can probably start a new one - so won't do CheckHyperspace like SetScanMode does.
+                __instance.SetMode(ScanMode.Deep, null);
+            }
+            else
+            {
+                // Otherwise the scan was saturated.
+                __instance.S.Sys.Log.AddLine("[AutoScan] Not starting a new Deep Scan as this one seems to have failed.");
+            }
+
+        }
     }
 }
