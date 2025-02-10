@@ -12,3 +12,8 @@ Libraries/*.json
 
 .vscode/obj/
 obj/
+
+# symlink
+gamefolder
+
+Libraries
